@@ -5,8 +5,7 @@ import sys, os
 sys.path.append(os.path.dirname(__file__))
 sys.path.append(os.path.join(os.path.dirname(__file__),'../../base'))
 
-from sofabase import sofabase
-from sofabase import adapterbase
+from sofabase import sofabase, adapterbase, configbase
 import devices
 
 
@@ -18,7 +17,7 @@ import aiohttp
 
 
 class post(sofabase):
-
+    
     class EndpointHealth(devices.EndpointHealth):
 
         @property            
@@ -47,7 +46,8 @@ class post(sofabase):
     
     class adapterProcess(adapterbase):
     
-        def __init__(self, log=None, loop=None, dataset=None, notify=None, request=None, **kwargs):
+        def __init__(self, log=None, loop=None, dataset=None, notify=None, request=None, config=None, **kwargs):
+            self.config=config
             self.dataset=dataset
             self.dataset.nativeDevices['target']={}
             self.log=log
