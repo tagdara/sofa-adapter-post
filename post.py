@@ -68,10 +68,13 @@ class post(sofabase):
 
         # Adapter Overlays that will be called from dataset
         def addSmartDevice(self, path):
-            
             try:
-                if path.split("/")[1]=="target":
-                    return self.addSmartPost(path.split("/")[2])
+                device_id=path.split("/")[2]
+                device_type=path.split("/")[1]
+                endpointId="%s:%s:%s" % ("hue", device_type, device_id)
+                if endpointId not in self.dataset.localDevices:  # localDevices/friendlyNam                
+                    if device_type=="target":
+                        return self.addSmartPost(device_id)
 
             except:
                 self.log.error('Error defining smart device', exc_info=True)
@@ -81,13 +84,10 @@ class post(sofabase):
         async def addSmartPost(self, deviceid):
             
             nativeObject=self.dataset.nativeDevices['target'][deviceid]
-            if nativeObject['name'] not in self.dataset.localDevices:
-                device=devices.alexaDevice('post/target/%s' % deviceid, nativeObject['name'], displayCategories=['OTHER'], adapter=self)
-                device.PowerController=post.PowerController(device=device)
-                device.EndpointHealth=post.EndpointHealth(device=device)
-                return self.dataset.newaddDevice(device)
-
-            return False
+            device=devices.alexaDevice('post/target/%s' % deviceid, nativeObject['name'], displayCategories=['OTHER'], adapter=self)
+            device.PowerController=post.PowerController(device=device)
+            device.EndpointHealth=post.EndpointHealth(device=device)
+            return self.dataset.add_device(device)
 
         async def executePost(self, target, command, data=""):
             
